@@ -6,13 +6,41 @@
 
     <description>== Shiro Components ==</description>
 
-    <!-- 自定义Realm -->
-    <bean id="YouCMSRealm" class="com.myside.shiro.YouCMSRealm"/>
-
     <!-- 安全管理器 -->
     <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
         <property name="realm" ref="YouCMSRealm"/>
     </bean>
+
+    <!-- 自定义Realm -->
+    <bean id="YouCMSRealm" class="com.myside.shiro.YouCMSRealm">
+        <property name="credentialsMatcher" ref="credentialsMatcher"/>
+    </bean>
+    <!-- 凭证匹配器 -->
+    <bean id="credentialsMatcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+        <property name="hashAlgorithmName" value="md5" />
+        <property name="hashIterations" value="1" /> <!--1次md5迭代-->
+    </bean>
+
+    <!--密码生成器-->
+    <!--<bean id="passwordMatcher" class="org.apache.shiro.authc.credential.PasswordMatcher">-->
+        <!--<property name="hashAlgorithmName" value="md5" />-->
+        <!--<property name="hashIterations" value="1" /> &lt;!&ndash;1次md5迭代&ndash;&gt;-->
+    <!--</bean>-->
+    <!--<bean id="passwordService" class="org.apache.shiro.authc.credential.DefaultPasswordService">-->
+        <!--<property name="hashFormat" value="md5" /> &lt;!&ndash;org.apache.shiro.crypto.hash.format.Shiro1CryptFormat&ndash;&gt;-->
+        <!--<property name="hashIterations" value="1" /> &lt;!&ndash;1次md5迭代&ndash;&gt;-->
+    <!--</bean>-->
+    <bean id="passwordService" class="org.apache.shiro.authc.credential.DefaultPasswordService">
+        <property name="hashAlgorithmName" value="md5" />
+        <property name="hashFormat" value="md5" />
+    </bean>
+    <bean id="passwordMatcher" class="org.apache.shiro.authc.credential.PasswordMatcher">
+        <property name="passwordService" ref="passwordService" />
+    </bean>
+
+
+
+
 
     <!-- Shiro过滤器 -->
     <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">

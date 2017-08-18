@@ -2,6 +2,7 @@ package com.myside.shiro;
 
 import com.myside.entity.U_User;
 import com.myside.service.Impl.UserService;
+import com.myside.util.EndecryptUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -24,10 +25,13 @@ public class YouCMSRealm extends AuthorizingRealm {
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         String username = (String) token.getPrincipal(); // 获取用户名
         U_User user = userService.getByNickname(username); //从数据库得到用户对象
-        System.out.println("userPswd="+user.getPswd());
+        System.out.println("数据库密码userPswd="+user.getPswd());
 
         if(user != null) {
+            //email + '#' + pswd，然后MD5
+            String password_input_md5=new EndecryptUtils().getMD5(user.getPswd());
             AuthenticationInfo authcInfo = new SimpleAuthenticationInfo(user, user.getPswd(), "YouCMSRealm");
+            System.out.println("password_input_md5="+password_input_md5);
             return authcInfo;
         } else {
             return null;
