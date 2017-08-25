@@ -21,21 +21,19 @@
         <property name="hashIterations" value="1" /> <!--1次md5迭代-->
     </bean>
 
-    <!--密码生成器-->
-    <!--<bean id="passwordMatcher" class="org.apache.shiro.authc.credential.PasswordMatcher">-->
-        <!--<property name="hashAlgorithmName" value="md5" />-->
-        <!--<property name="hashIterations" value="1" /> &lt;!&ndash;1次md5迭代&ndash;&gt;-->
-    <!--</bean>-->
-    <!--<bean id="passwordService" class="org.apache.shiro.authc.credential.DefaultPasswordService">-->
-        <!--<property name="hashFormat" value="md5" /> &lt;!&ndash;org.apache.shiro.crypto.hash.format.Shiro1CryptFormat&ndash;&gt;-->
-        <!--<property name="hashIterations" value="1" /> &lt;!&ndash;1次md5迭代&ndash;&gt;-->
-    <!--</bean>-->
+    <!--使用shiro提供密码生成器-->
+    <bean id="hashService" class="org.apache.shiro.crypto.hash.DefaultHashService">
+        <property name="hashAlgorithmName" value="md5"></property>
+    </bean>
+    <bean id="hashFormat" class="org.apache.shiro.crypto.hash.format.HexFormat"></bean>
+    <bean id="hashFormatFactory" class="org.apache.shiro.crypto.hash.format.DefaultHashFormatFactory"></bean>
     <bean id="passwordService" class="org.apache.shiro.authc.credential.DefaultPasswordService">
-        <property name="hashAlgorithmName" value="md5" />
-        <property name="hashFormat" value="md5" />
+        <property name="hashService" ref="hashService"/>
+        <property name="hashFormat"  ref="hashFormat"/>
+        <property name="hashFormatFactory" ref="hashFormatFactory"/>
     </bean>
     <bean id="passwordMatcher" class="org.apache.shiro.authc.credential.PasswordMatcher">
-        <property name="passwordService" ref="passwordService" />
+        <property name="passwordService" ref="passwordService"/>
     </bean>
 
 
