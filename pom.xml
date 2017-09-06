@@ -22,7 +22,13 @@
   <!--<version>1.1.1</version>-->
   <!--</dependency>-->
   <!--log4j2支持-->
-  <dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
+      <version>2.8.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
     <groupId>org.apache.logging.log4j</groupId>
     <artifactId>log4j-core</artifactId>
     <version>${org.apache.logging.log4j.version}</version>
@@ -32,6 +38,36 @@
     <artifactId>log4j-api</artifactId>
     <version>${org.apache.logging.log4j.version}</version>
   </dependency>
+  <dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-api</artifactId>
+    <version>${org.slf4j.version}</version>
+  </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-nop</artifactId>
+      <version>${org.slf4j.version}</version>
+    </dependency>
+
+
+    <!-- shiro核心包 -->
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-core</artifactId>
+      <version>${org.apache.shiro.version}</version>
+    </dependency>
+    <!-- 添加shiro web支持 -->
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-web</artifactId>
+      <version>${org.apache.shiro.version}</version>
+    </dependency>
+    <!-- 添加shiro spring支持 -->
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-spring</artifactId>
+      <version>${org.apache.shiro.version}</version>
+    </dependency>
 
 
   <!-- 2.数据库 -->
@@ -183,7 +219,13 @@
         <!-- 在上面使用版本号的时候需要用固定格式,如: ${包名.version} -->
 <properties>
     <org.apache.logging.log4j.version>2.6.2</org.apache.logging.log4j.version>
+    <org.slf4j.version>1.7.25</org.slf4j.version>
+
     <mysql.version>5.1.37</mysql.version>
+    <org.apache.shiro.version>1.4.0</org.apache.shiro.version>
+
+
+
     <com.alibaba.druid.version>1.0.25</com.alibaba.druid.version>
     <com.mybatis.mybatis.version>3.4.1</com.mybatis.mybatis.version>
     <com.mybatis.mybatis_spring.version>1.3.0</com.mybatis.mybatis_spring.version>
@@ -195,8 +237,30 @@
     <developer.organization><![CDATA[scengine]]></developer.organization>
 </properties>
 
+
         <!-- 构建项目的最终名称 -->
   <build>
     <finalName>YouCMS</finalName>
+    <plugins>
+<!--mybatis生成类插件-->
+      <plugin>
+        <groupId>org.mybatis.generator</groupId>
+        <artifactId>mybatis-generator-maven-plugin</artifactId>
+        <version>1.3.5</version>
+        <configuration>
+          <verbose>true</verbose>
+          <overwrite>true</overwrite>
+        </configuration>
+      </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <source>1.6</source>
+                <target>1.6</target>
+            </configuration>
+        </plugin>
+        <!--mybatis生成类插件-->
+    </plugins>
   </build>
 </project>

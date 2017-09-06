@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>后台登陆页</title>
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <link href="/favicon.ico" rel="bookmark"/>
+    <link href="/favicon.ico" rel="bookmark">
     <link href="/favicon.ico" rel="shortcut icon">
     <link rel="stylesheet" href="/static/lib/bootstrap/css/bootstrap.min.css">
     <!-- Font Awesome -->
@@ -52,11 +52,16 @@
                 <input type="password" name="password" class="form-control" placeholder="Password">
                 <span class="glyphicon glyphicon-lock form-control-feedback"></span>
             </div>
+            <div class="form-group has-feedback">
+            <input id="randomcode" name="randomcode" size="8" />
+                <img id="randomcode_img" src="/view/admin/validatecode.jsp" alt="" width="56" height="28" align='absMiddle' />
+                <a href=javascript:randomcode_refresh()>刷新</a>
+            </div>
             <div class="row">
                 <div class="col-xs-8">
                     <div class="checkbox icheck">
                         <label>
-                            <input type="checkbox"> Remember Me
+                            <input name="remember" value="1" type="checkbox"> Remember Me
                         </label>
                     </div>
                 </div>
@@ -86,14 +91,16 @@
 <!-- /.login-box -->
 
 <!-- jQuery 3 -->
-<script src="/static/lib/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="/static/lib/jquery/jquery.min.js"></script>
+<%--<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>--%>
 <!-- Bootstrap 3.3.7 -->
-<script src="/static/lib/bootstrap/js/bootstrap.min.js"></script>
+<%--<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" ></script>--%>
+<script type="text/javascript" src="/static/lib/bootstrap/js/bootstrap.min.js"></script>
 <!-- iCheck -->
 <script src="/static/plugins/iCheck/icheck.min.js"></script>
-<script>
+<script type="text/javascript">
     $(function () {
-        $('input').iCheck({
+        $("input").iCheck({
             checkboxClass: 'icheckbox_square-blue',
             radioClass: 'iradio_square-blue',
             increaseArea: '20%' // optional

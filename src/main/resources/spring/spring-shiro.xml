@@ -9,6 +9,14 @@
     <!-- 安全管理器 -->
     <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
         <property name="realm" ref="YouCMSRealm"/>
+        <!--<property name="realm" ref="ShiroRealm"/>-->
+
+
+        <!-- 注入记住我 -->
+        <property name="rememberMeManager" ref="rememberMeManager"/>
+
+        <!-- 只设置记住我的时间-->
+        <!--<property name="rememberMeManager.cookie.maxAge" value="100"></property>-->
     </bean>
 
     <!-- 自定义Realm -->
@@ -21,12 +29,27 @@
         <property name="hashIterations" value="1" /> <!--1次md5迭代-->
     </bean>
 
-    <!--使用shiro提供密码生成器-->
+    <bean id="ShiroRealm" class="com.myside.shiro.ShiroRealm">
+        <property name="credentialsMatcher">
+            <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+                <!-- 加密算法 -->
+                <property name="hashAlgorithmName" value="MD5"></property>
+                <!-- 加密的次数 -->
+                <property name="hashIterations" value="1"></property>
+            </bean>
+        </property>
+    </bean>
+
+    <!--使用shiro提供密码生成器 或直接用org.apache.shiro.crypto.hash.SimpleHash-->
     <bean id="hashService" class="org.apache.shiro.crypto.hash.DefaultHashService">
         <property name="hashAlgorithmName" value="md5"></property>
+        <property name="privateSalt" value="#{T(org.apache.shiro.util.ByteSource.Util).bytes('123456')}"></property>
     </bean>
-    <bean id="hashFormat" class="org.apache.shiro.crypto.hash.format.HexFormat"></bean>
-    <bean id="hashFormatFactory" class="org.apache.shiro.crypto.hash.format.DefaultHashFormatFactory"></bean>
+    <!--<bean id="privateSalt" class="org.apache.shiro.util.ByteSource.Util">-->
+        <!--<constructor-arg value="XXXXSalt" />-->
+    <!--</bean>-->
+    <bean id="hashFormat" class="org.apache.shiro.crypto.hash.format.HexFormat"/>
+    <bean id="hashFormatFactory" class="org.apache.shiro.crypto.hash.format.DefaultHashFormatFactory"/>
     <bean id="passwordService" class="org.apache.shiro.authc.credential.DefaultPasswordService">
         <property name="hashService" ref="hashService"/>
         <property name="hashFormat"  ref="hashFormat"/>
@@ -37,34 +60,62 @@
     </bean>
 
 
-
-
-
     <!-- Shiro过滤器 -->
     <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
         <!-- Shiro的核心安全接口,这个属性是必须的 -->
         <property name="securityManager" ref="securityManager"/>
         <!-- 身份认证失败，则跳转到登录页面的配置 -->
-        <property name="loginUrl" value="/admin/login"/>
+        <!-- loginUrl认证提交地址，如果没有认证将会请求此地址进行认证，请求此地址将由formAuthenticationFilter进行表单认证 -->
+        <property name="loginUrl" value="/view/admin/login.jsp"/>
         <!-- 权限认证失败，则跳转到指定页面 -->
-        <property name="unauthorizedUrl" value="/admin/login"/>
+        <property name="unauthorizedUrl" value="/view/admin/unauthorized.jsp"/>
+
+        <property name="successUrl" value="/view/admin/index.jsp"/>
+
+        <!--<property name="filters">-->
+        <!--<map>-->
+        <!--&lt;!&ndash;<entry key="authc" value-ref="formAuthenticationFilter"/>&ndash;&gt;-->
+        <!--<entry key="user" value-ref="CustomFormAuthenticationFilter"/>-->
+        <!--</map>-->
+        <!--</property>-->
+
         <!-- Shiro连接约束配置,即过滤链的定义 -->
         <property name="filterChainDefinitions">
             <value>
-                <!--/static/**=anon-->
-                /admin/login=anon  <!--可以匿名访问-->
-                /admin/validatelogin=anon
-                /admin/index=anon
-                /admin/** = authc
-                <!--/user/admin*=authc-->
-                <!--/user/student*/**=roles[teacher]-->
-                <!--/user/teacher*/**=perms["user:create"]-->
+                /druid=anon
+                /static/**=anon
+                #<!--可以匿名访问-->
+                /view/admin/validatecode.jsp = anon
+                /view/hello.jsp = anon
+                /view/index.jsp = anon
+                /view/admin/login.jsp = anon
+                #/admin/login = anon
+                /admin/validatelogin = anon
 
+                /admin/login2 = anon
+
+                /admin/logout = logout
+                /admin/user/** = user,roles[admin]
+                /admin/index = user
+                /admin/** = authc
+                #<!--/user/admin*=authc-->
+                #<!--/user/student*/**=roles[teacher]-->
+                #<!--/user/teacher*/**=perms["user:create"]-->
+                #<!-- -/**=authc 表示所有的url都必须认证通过才可以访问- -->
+                /** = user
             </value>
         </property>
     </bean>
 
-    <bean id="cacheManager" class="org.apache.shiro.cache.MemoryConstrainedCacheManager" />
+    <!-- session会话管理器 -->
+    <bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+        <!-- session的失效时长，单位毫秒 -->
+        <property name="globalSessionTimeout" value="600000"/>
+        <!-- 删除失效的session -->
+        <property name="deleteInvalidSessions" value="true"/>
+    </bean>
+
+    <!--<bean id="cacheManager" class="org.apache.shiro.cache.MemoryConstrainedCacheManager" />-->
     <!-- 保证实现了Shiro内部lifecycle函数的bean执行 -->
     <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
 
@@ -74,4 +125,26 @@
         <property name="securityManager" ref="securityManager"/>
     </bean>
 
+
+
+     <!--rememberMeManager管理器 -->
+    <bean id="rememberMeManager" class="org.apache.shiro.web.mgt.CookieRememberMeManager">
+        <property name="cipherKey" value="#{T(org.apache.shiro.codec.Base64).decode('4AvVhmFLUs0KTA3Kprsdag==')}" />
+        <property name="cookie" ref="rememberMeCookie" />
+    </bean>
+    <!-- 记住我cookie -->
+    <bean id="rememberMeCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+        <!--rememberMe时cookie的名字-->
+        <constructor-arg value="YourememberMe" />
+        <property name="httpOnly" value="true" />
+        <!-- 记住我cookie生效时间30天 2592000-->
+        <property name="maxAge" value="100" />
+    </bean>
+    <bean id="CustomFormAuthenticationFilter" class="com.myside.shiro.CustomFormAuthenticationFilter">
+    <!--<bean id="formAuthenticationFilter" class="org.apache.shiro.web.filter.authc.FormAuthenticationFilter">-->
+        <property name="usernameParam" value="username"/>
+        <property name="passwordParam" value="password"/>
+        <property name="rememberMeParam" value="remember"/>
+        <!--<property name="loginUrl" value="/view/admin/login.jsp"/>-->
+    </bean>
 </beans>

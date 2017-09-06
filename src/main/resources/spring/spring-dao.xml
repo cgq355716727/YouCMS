@@ -55,7 +55,7 @@
         <property name="filters" value="stat" />
         <property name="proxyFilters">
             <list>
-                <ref bean="logFilter" />
+                <ref bean="log-filter" />
             </list>
         </property>
     </bean>
@@ -82,7 +82,7 @@
     </bean>
 
     <!-- 上面的druid的配置 -->
-    <bean id="logFilter" class="com.alibaba.druid.filter.logging.Slf4jLogFilter">
+    <bean id="log-filter" class="com.alibaba.druid.filter.logging.Slf4jLogFilter">
         <property name="statementExecutableSqlLogEnable" value="false" />
     </bean>
 </beans>

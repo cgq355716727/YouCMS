@@ -34,4 +34,9 @@ public class UserService implements IUserService{
         //return userDao.getPermissions(username);
     }
 
+    //
+    public void setPassword(){
+
+    }
+
 }
